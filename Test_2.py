@@ -2,10 +2,10 @@ import os
 import re
 import numpy as np
 import nltk
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize
+from nltk.corpus import stopwords
+from sentence_transformers import SentenceTransformer
+from sklearn.metrics.pairwise import cosine_similarity
 
 # nltk.download('punkt')
 # nltk.download('stopwords')
@@ -20,48 +20,21 @@ def read_and_clean_text(path):
     clean_text = re.sub(r'<[^>]+>', ' ', content)
     clean_text = re.sub(r'\s+', ' ', clean_text).strip()
     sentences = re.split(r'(?<=[.!?])\s+', clean_text)
-    print("📄 Văn bản đã được chia câu:")
+    print("\n📄 Văn bản đã được chia câu:")
     return sentences
 
-# Step 2: Preprocess sentences
-def preprocess_sentences(sentences):
-    processed = []
-    for sentence in sentences:
-        words = sentence.split()
-        filtered = [word for word in words if word.lower() not in stop_words]
-        processed.append(' '.join(filtered))
-    print("\n🧹 After stopword removal:")
-    for i, s in enumerate(processed, 1):
-        print(f"Processed {i}: {s}")
-    return processed
-
-# Step 3: Compute TF-IDF vectors
-def compute_tfidf_vectors(processed_sentences):
-    vectorizer = TfidfVectorizer()
-    tfidf_matrix = vectorizer.fit_transform(processed_sentences)
-
-    tf_raw = tfidf_matrix.copy()
-    tf_raw.data = np.ones_like(tf_raw.data)
-    tf = tf_raw.multiply(1.0 / tf_raw.sum(axis=1))
-
-    idf = vectorizer.idf_
-    idf_diag = np.diag(idf)
-
-    tfidf_combined = tf @ idf_diag
-
-    print("\n📌 Term Frequency (TF):")
-    print(tf.toarray())
-    print("\n📌 Inverse Document Frequency (IDF):")
-    print(idf)
-    print("\n📊 TF-IDF (kết quả TF x IDF):")
-    print(tfidf_combined)
-
-    return tfidf_combined
+# Step 3: Sử dụng Sentence-BERT thay vì TF-IDF
+def compute_sbert_embeddings(sentences, model_name='all-MiniLM-L6-v2'):
+    print("\n🔍 Đang tải mô hình SBERT và tính embedding...")
+    model = SentenceTransformer(model_name)
+    embeddings = model.encode(sentences)
+    print("✅ Đã tạo xong embedding cho từng câu.")
+    return embeddings
 
 # Step 4: Compute cosine similarity
-def compute_similarity(tfidf_matrix):
-    similarity = cosine_similarity(tfidf_matrix)
-    print("\n🔗 Cosine similarity matrix:")
+def compute_similarity(embeddings):
+    similarity = cosine_similarity(embeddings)
+    print("\n🔗 Cosine similarity matrix from SBERT:")
     print(similarity)
     return similarity
 
@@ -91,6 +64,7 @@ def pagerank(similarity_matrix, damping=0.85, max_iter=100, tol=1e-6):
     n = similarity_matrix.shape[0]
     row_sums = similarity_matrix.sum(axis=1, keepdims=True)
     stochastic_matrix = similarity_matrix / np.where(row_sums != 0, row_sums, 1)
+
     scores = np.ones(n) / n
 
     for _ in range(max_iter):
@@ -99,12 +73,9 @@ def pagerank(similarity_matrix, damping=0.85, max_iter=100, tol=1e-6):
         if np.linalg.norm(scores - prev_scores, ord=1) < tol:
             break
 
-    print("\n🏁 Điểm PageRank của từng câu (hiển thị 5 cột):")
-    for i in range(0, n, 5):
-        row = ''
-        for j in range(i, min(i + 5, n)):
-            row += f"Câu {j+1}: {scores[j]:.4f}    "
-        print(row.strip())
+    print("\n🏁 Điểm PageRank của từng câu:")
+    for i, score in enumerate(scores):
+        print(f"Câu {i+1}: {score:.4f}")
 
     return scores
 
@@ -114,11 +85,9 @@ def summarize(sentences, scores, ratio=0.1):
     top_n = max(1, int(total_sentences * ratio))
     top_indices = sorted(range(total_sentences), key=lambda i: scores[i], reverse=True)[:top_n]
     top_indices.sort()
-
     print(f"\n📝 Summary (Top {top_n} sentences ~ {ratio:.0%}):")
     for i in top_indices:
         print(f"- {sentences[i]}")
-
     return [sentences[i] for i in top_indices]
 
 # Step 8: Combine summary sentences into a paragraph
@@ -127,48 +96,31 @@ def combine_summary_sentences(summary_sentences):
     combined = re.sub(r'\s+([.,!?])', r'\1', combined)
     return combined
 
-# ✅ Step 9: Evaluate summary using cosine similarity
-def evaluate_summary(system_summary, reference_path, similarity_threshold=0.5):
-    from sklearn.feature_extraction.text import TfidfVectorizer
-    from sklearn.metrics.pairwise import cosine_similarity
-
+# Step 9: Evaluate summary by sentence
+def evaluate_summary(system_summary, reference_path):
     with open(reference_path, 'r', encoding='utf-8') as f:
         reference_text = f.read()
-
     reference_text = re.sub(r'<[^>]+>', ' ', reference_text)
     reference_text = re.sub(r'\s+', ' ', reference_text).strip()
 
     system_sentences = sent_tokenize(system_summary.strip())
     reference_sentences = sent_tokenize(reference_text.strip())
 
-    if not system_sentences or not reference_sentences:
-        print("⚠️ Không có câu nào trong summary hoặc reference để đánh giá.")
-        return 0.0, 0.0, 0.0
+    def normalize(sentences):
+        return set(re.sub(r'\s+', ' ', s.lower().strip()) for s in sentences)
 
-    all_sentences = system_sentences + reference_sentences
-    vectorizer = TfidfVectorizer().fit(all_sentences)
+    system_set = normalize(system_sentences)
+    reference_set = normalize(reference_sentences)
 
-    sys_vectors = vectorizer.transform(system_sentences)
-    ref_vectors = vectorizer.transform(reference_sentences)
-
-    matched_ref_idx = set()
-    true_positives = 0
-    for i, sys_vec in enumerate(sys_vectors):
-        similarities = cosine_similarity(sys_vec, ref_vectors)[0]
-        best_match_idx = np.argmax(similarities)
-        if similarities[best_match_idx] >= similarity_threshold and best_match_idx not in matched_ref_idx:
-            true_positives += 1
-            matched_ref_idx.add(best_match_idx)
-
-    precision = true_positives / len(system_sentences)
-    recall = true_positives / len(reference_sentences)
+    true_positives = len(system_set & reference_set)
+    precision = true_positives / len(system_set) if system_set else 0.0
+    recall = true_positives / len(reference_set) if reference_set else 0.0
     f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) else 0.0
 
-    print(f"\n📊 Summary Evaluation (Cosine Similarity ≥ {similarity_threshold:.2f}):")
+    print("\n📊 Summary evaluation (by sentence):")
     print(f"🔹 Precision: {precision:.2%}")
     print(f"🔹 Recall:    {recall:.2%}")
     print(f"🔹 F1-score:  {f1:.2%}")
-    
     return precision, recall, f1
 
 # ========================
@@ -177,14 +129,12 @@ def evaluate_summary(system_summary, reference_path, similarity_threshold=0.5):
 file_name = input("Enter the file name (without extension): ").strip()
 if not file_name:
     raise ValueError("File name cannot be empty.")
-
 file_path = os.path.abspath(f"DUC_TEXT/train/{file_name}")
 reference_path = os.path.abspath(f"DUC_SUM/{file_name}")
 
 sentences = read_and_clean_text(file_path)
-processed = preprocess_sentences(sentences)
-tfidf = compute_tfidf_vectors(processed)
-similarity = compute_similarity(tfidf)
+embeddings = compute_sbert_embeddings(sentences)
+similarity = compute_similarity(embeddings)
 graph = build_graph(similarity, threshold=0.25)
 scores = pagerank(graph)
 summary = summarize(sentences, scores, ratio=0.1)
@@ -193,5 +143,5 @@ combined_summary = combine_summary_sentences(summary)
 print("\n🖋️ Complete summary:")
 print(combined_summary)
 
-# Evaluate (theo câu với cosine similarity)
+# Evaluate summary
 evaluate_summary(combined_summary, reference_path)
