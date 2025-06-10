@@ -1,0 +1,54 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/134.0.0.0 Safari/537.36" version="26.1.0">
+  <diagram name="Trang-1" id="OxF84S0xgBDbv4VXkqHn">
+    <mxGraphModel dx="1256" dy="1023" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-4" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="gQHZ93iy-JzdNfxrYEU1-2" target="gQHZ93iy-JzdNfxrYEU1-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-2" value="Input Document" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-240" y="-90" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-6" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="gQHZ93iy-JzdNfxrYEU1-3" target="gQHZ93iy-JzdNfxrYEU1-5">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-12" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="gQHZ93iy-JzdNfxrYEU1-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="10" y="-30" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-3" value="Biểu diễn văn bản thành đồ thị" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-240" y="30" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-8" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="gQHZ93iy-JzdNfxrYEU1-5" target="gQHZ93iy-JzdNfxrYEU1-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-5" value="Xếp hạng" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-240" y="170" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-10" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;" edge="1" parent="1" source="gQHZ93iy-JzdNfxrYEU1-7" target="gQHZ93iy-JzdNfxrYEU1-9">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-7" value="Lấy đỉnh trọng số cáo nhât" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-240" y="300" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-9" value="Output (tóm tắt)" style="shape=parallelogram;perimeter=parallelogramPerimeter;whiteSpace=wrap;html=1;fixedSize=1;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="-240" y="410" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-13" value="" style="edgeStyle=none;curved=1;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;fontSize=12;startSize=8;endSize=8;exitX=1;exitY=1;exitDx=0;exitDy=0;" edge="1" parent="1" source="gQHZ93iy-JzdNfxrYEU1-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="-110" y="42" as="sourcePoint" />
+            <mxPoint y="160" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-14" value="Từ trùng nhau" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;rotation=0;" vertex="1" parent="1">
+          <mxGeometry y="-50" width="130" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="gQHZ93iy-JzdNfxrYEU1-15" value="Độ tương đồng ngữ nghĩa" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;fontSize=16;" vertex="1" parent="1">
+          <mxGeometry x="-10" y="151" width="210" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
