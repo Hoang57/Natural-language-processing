@@ -20,7 +20,7 @@ def read_and_clean_text(path):
     clean_text = re.sub(r'<[^>]+>', ' ', content)
     clean_text = re.sub(r'\s+', ' ', clean_text).strip()
     sentences = re.split(r'(?<=[.!?])\s+', clean_text)
-    print("\n📄 Văn bản đã được chia câu:")
+    print("\n Văn bản đã được chia câu:")
     return sentences
 
 # Step 3: Sử dụng Sentence-BERT thay vì TF-IDF
@@ -28,7 +28,7 @@ def compute_sbert_embeddings(sentences, model_name='all-MiniLM-L6-v2'):
     print("\n🔍 Đang tải mô hình SBERT và tính embedding...")
     model = SentenceTransformer(model_name)
     embeddings = model.encode(sentences)
-    print("✅ Đã tạo xong embedding cho từng câu.")
+    print("Đã tạo xong embedding cho từng câu.")
     return embeddings
 
 # Step 4: Compute cosine similarity
@@ -56,7 +56,7 @@ def build_graph(similarity_matrix, threshold=0.25, output_path='adjacency_matrix
         for row in adjacency_matrix:
             f.write(' '.join(map(str, row)) + '\n')
 
-    print(f"\n✅ Đã lưu ma trận kề vào file: {output_path}")
+    print(f"\n Đã lưu ma trận kề vào file: {output_path}")
     return adjacency_matrix
 
 # Step 6: PageRank algorithm
@@ -73,7 +73,7 @@ def pagerank(similarity_matrix, damping=0.85, max_iter=100, tol=1e-6):
         if np.linalg.norm(scores - prev_scores, ord=1) < tol:
             break
 
-    print("\n🏁 Điểm PageRank của từng câu:")
+    print("\n Điểm PageRank của từng câu:")
     for i, score in enumerate(scores):
         print(f"Câu {i+1}: {score:.4f}")
 
@@ -85,7 +85,7 @@ def summarize(sentences, scores, ratio=0.1):
     top_n = max(1, int(total_sentences * ratio))
     top_indices = sorted(range(total_sentences), key=lambda i: scores[i], reverse=True)[:top_n]
     top_indices.sort()
-    print(f"\n📝 Summary (Top {top_n} sentences ~ {ratio:.0%}):")
+    print(f"\n Summary (Top {top_n} sentences ~ {ratio:.0%}):")
     for i in top_indices:
         print(f"- {sentences[i]}")
     return [sentences[i] for i in top_indices]
@@ -117,10 +117,10 @@ def evaluate_summary(system_summary, reference_path):
     recall = true_positives / len(reference_set) if reference_set else 0.0
     f1 = (2 * precision * recall) / (precision + recall) if (precision + recall) else 0.0
 
-    print("\n📊 Summary evaluation (by sentence):")
-    print(f"🔹 Precision: {precision:.2%}")
-    print(f"🔹 Recall:    {recall:.2%}")
-    print(f"🔹 F1-score:  {f1:.2%}")
+    print("\n Summary evaluation (by sentence):")
+    print(f"Precision: {precision:.4f}")
+    print(f"Recall:    {recall:.4f}")
+    print(f"F1-score:  {f1:.4f}")
     return precision, recall, f1
 
 # ========================
@@ -140,7 +140,7 @@ scores = pagerank(graph)
 summary = summarize(sentences, scores, ratio=0.1)
 combined_summary = combine_summary_sentences(summary)
 
-print("\n🖋️ Complete summary:")
+print("\n Complete summary:")
 print(combined_summary)
 
 # Evaluate summary
