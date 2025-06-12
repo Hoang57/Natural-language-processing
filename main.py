@@ -23,22 +23,23 @@ def read_and_clean_text(path):
     print("\n Văn bản đã được chia câu:")
     return sentences
 
-# Step 3: Sử dụng Sentence-BERT thay vì TF-IDF
+# Step 2: Sử dụng Sentence-BERT thay vì TF-IDF
 def compute_sbert_embeddings(sentences, model_name='all-MiniLM-L6-v2'):
     print("\n🔍 Đang tải mô hình SBERT và tính embedding...")
     model = SentenceTransformer(model_name)
     embeddings = model.encode(sentences)
     print("Đã tạo xong embedding cho từng câu.")
+    print(f"Shape of embeddings: {embeddings}")
     return embeddings
 
-# Step 4: Compute cosine similarity
+# Step 3: Compute cosine similarity
 def compute_similarity(embeddings):
     similarity = cosine_similarity(embeddings)
     print("\n🔗 Cosine similarity matrix from SBERT:")
     print(similarity)
     return similarity
 
-# Step 5: Build adjacency matrix
+# Step 4: Build adjacency matrix
 def build_graph(similarity_matrix, threshold=0.25, output_path='adjacency_matrix.txt'):
     n = similarity_matrix.shape[0]
     adjacency_matrix = np.zeros((n, n), dtype=int)
@@ -48,7 +49,7 @@ def build_graph(similarity_matrix, threshold=0.25, output_path='adjacency_matrix
             if i != j and similarity_matrix[i, j] >= threshold:
                 adjacency_matrix[i, j] = 1
 
-    print(f"\n🕸️ Adjacency matrix (threshold = {threshold}):")
+    print(f"\n Adjacency matrix (threshold = {threshold}):")
     print(adjacency_matrix)
 
     with open(output_path, 'w', encoding='utf-8') as f:
@@ -59,7 +60,7 @@ def build_graph(similarity_matrix, threshold=0.25, output_path='adjacency_matrix
     print(f"\n Đã lưu ma trận kề vào file: {output_path}")
     return adjacency_matrix
 
-# Step 6: PageRank algorithm
+# Step 5: PageRank algorithm
 def pagerank(similarity_matrix, damping=0.85, max_iter=100, tol=1e-6):
     n = similarity_matrix.shape[0]
     row_sums = similarity_matrix.sum(axis=1, keepdims=True)
@@ -75,11 +76,13 @@ def pagerank(similarity_matrix, damping=0.85, max_iter=100, tol=1e-6):
 
     print("\n Điểm PageRank của từng câu:")
     for i, score in enumerate(scores):
-        print(f"Câu {i+1}: {score:.4f}")
+        print(f"Câu {i+1}: {score:.4f}", end='\t')
+        if (i + 1) % 5 == 0 or i == n - 1:
+            print()
 
     return scores
 
-# Step 7: Extract summary
+# Step 6: Extract summary
 def summarize(sentences, scores, ratio=0.1):
     total_sentences = len(scores)
     top_n = max(1, int(total_sentences * ratio))
@@ -90,13 +93,13 @@ def summarize(sentences, scores, ratio=0.1):
         print(f"- {sentences[i]}")
     return [sentences[i] for i in top_indices]
 
-# Step 8: Combine summary sentences into a paragraph
+# Step 7: Combine summary sentences into a paragraph
 def combine_summary_sentences(summary_sentences):
     combined = ' '.join(summary_sentences)
     combined = re.sub(r'\s+([.,!?])', r'\1', combined)
     return combined
 
-# Step 9: Evaluate summary by sentence
+# Step 8: Evaluate summary by sentence
 def evaluate_summary(system_summary, reference_path):
     with open(reference_path, 'r', encoding='utf-8') as f:
         reference_text = f.read()
