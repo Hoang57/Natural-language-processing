@@ -3,14 +3,14 @@ import re
 import numpy as np
 import nltk
 from nltk.tokenize import sent_tokenize
-from nltk.corpus import stopwords
+#from nltk.corpus import stopwords
 from sentence_transformers import SentenceTransformer
 from sklearn.metrics.pairwise import cosine_similarity
 
 # nltk.download('punkt')
 # nltk.download('stopwords')
 
-stop_words = set(stopwords.words('english'))
+#stop_words = set(stopwords.words('english'))
 
 # ========================
 # Step 1: Read and clean text
@@ -25,10 +25,10 @@ def read_and_clean_text(path):
 
 # Step 2: Sử dụng Sentence-BERT thay vì TF-IDF
 def compute_sbert_embeddings(sentences, model_name='all-MiniLM-L6-v2'):
-    print("\n🔍 Đang tải mô hình SBERT và tính embedding...")
+    print("\n Loading SBERT model and computing embeddings...")
     model = SentenceTransformer(model_name)
     embeddings = model.encode(sentences)
-    print("Đã tạo xong embedding cho từng câu.")
+    print("Finished creating embeddings for each sentence.")
     print(f"Shape of embeddings: {embeddings}")
     return embeddings
 
@@ -57,7 +57,6 @@ def build_graph(similarity_matrix, threshold=0.25, output_path='adjacency_matrix
         for row in adjacency_matrix:
             f.write(' '.join(map(str, row)) + '\n')
 
-    print(f"\n Đã lưu ma trận kề vào file: {output_path}")
     return adjacency_matrix
 
 # Step 5: PageRank algorithm
